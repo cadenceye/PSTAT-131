@@ -1,0 +1,125 @@
+---
+title: "HW1"
+author: "Xiaohe Ye"
+date: '2022-10-02'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(corrplot)
+```
+
+## Question 1:
+# Define supervised and unsupervised learning. What are the difference(s) between them?  
+Supervised Learning. For each observation of the predictor measurement(s) $x_i$, $i = 1,...,n$ there is an associated response
+measurement $y_i$. We wish to fit a model that relates the response to the predictors, with the aim of accurately predicting the response for future observations (prediction) or better understanding the relationship between the response and the predictors (inference).  
+
+Unsupervised Learning. Unsupervised learning describes the somewhat more challenging situation in which for every observation $i = 1,...,n$, we observe a vector of measurements $x_i$ but no associated response $y_i$. It is not possible to fit a linear regression model, since there is no response variable to predict. In this setting, we are in some sense working blind; the situation is referred to as unsupervised because we lack a response variable that can supervise our analysis.  
+
+From page #26 of book.  
+
+  
+## Question 2:  
+# Explain the difference between a regression model and a classification model, specifically in the context of machine learning.  
+Regression Model. Response variable is quantitative, such as price, blood pressure$(1)$. Example: Predicting the house price based on the size of the house, availability of schools in the area, and other essential factors.  
+  
+Classification Model. Response variable is qualitative, such as suvived/died, spam/not spam$(1)$.   Example: A person arrives at the emergency room with a set of symptoms that could possibly be attributed to one of three medical conditions. Which of the three conditions does the individual have?$(3)$ 
+
+$(1)$ From lecture #33 in day 1.  
+$(3)$ From page #130 of book.   
+
+
+## Question 3:  
+# Name two commonly used metrics for regression ML problems. Name two commonly used metrics for classification ML problems. (metrics, or calculations, that we can use to compare the performance of different models)   
+Regression ML problems: mean square error (MSE)/Root Mean Square Error(RMSE), R Square/Adjusted R Square.    
+Classification ML problems: Accuracy, Type I error.  
+
+
+## Question 4:  
+# As discussed, statistical models can be used for different purposes. These purposes can generally be classified into the following three categories. Provide a brief description of each.  
+Descriptive models: choose model to best visually emphasize a trend in data.  
+Inferential models: state relationship between outcome and predictor(s).  
+Predictive models: aim to predict Y with minimum reducible error. 
+
+From lecture #39 in day 1.  
+
+## Question 5:
+# Predictive models are frequently used in machine learning, and they can usually be described as either mechanistic or empirically-driven. Answer the following questions. 
+  
+Define mechanistic. Define empirically-driven. How do these model types differ? How are they similar?    
+A mechanistic model uses a theory to predict what will happen in the real world. The empirically-driven model studies real-world events to develop a theory. 
+  
+In general, is a mechanistic or empirically-driven model easier to understand? Explain your choice.   
+Mechanistic model is easier to understand. Because mechanistic model has less complexity.    
+  
+Describe how the bias-variance tradeoff is related to the use of mechanistic or empirically-driven models.    
+Empirically-driven models require a larger number of observations. This will lead to lower risk of bias but higher variability. High-variance learning methods may be able to represent their training set well but are at risk of overfitting to noisy or unrepresentative training data. Mechanistic models need to assume a parametric form for $f$. But this assumption might not match true unknown $f$, which is high bias. Algorithms with high bias typically produce simpler models that may fail to capture important regularities in the data.  
+
+## Question 6:
+# A political candidate’s campaign has collected some detailed voter history data from their constituents. The campaign is interested in two questions:  
+Given a voter’s profile/data, how likely is it that they will vote in favor of the candidate?   
+This question is predictive. Because we simply interested in whether a voter will vote in favor of this candidate.  
+  
+How would a voter’s likelihood of support for the candidate change if they had personal contact with the candidate?     
+This question is inferential. Because they'll try to make inference based on given data. This question wants to infer the likelihood of change instead of predicting will change or not.    
+  
+  
+## Exercise 1:
+# We are interested in highway miles per gallon, or the hwy variable. Create a histogram of this variable. Describe what you see/learn.    
+```{r}
+# View(mpg)
+hist(mpg$hwy)
+```
+
+This histogram of highway miles per gallon is slightly right-skewed. Most cars have a range $25-30$ highway miles per gallon. 
+
+## Exercise 2:
+# Create a scatterplot. Put hwy on the x-axis and cty on the y-axis. Describe what you notice. Is there a relationship between hwy and cty? What does this mean?    
+```{r}
+plot(mpg$cty~mpg$hwy)
+```
+  
+This is a positive linear relationship between hwy and cty. As city miles per gallon increase, the highway miles per gallon increase with it as well.  
+  
+## Exercise 3:
+# Make a bar plot of manufacturer. Flip it so that the manufacturers are on the y-axis. Order the bars by height. Which manufacturer produced the most cars? Which produced the least?    
+```{r}
+counts <- table(mpg$manufacturer)
+counts_sort <- counts[order(counts)]
+barplot(counts_sort, horiz=TRUE,names.arg = names(counts_sort))
+
+```
+
+Dodge produced the most cars. Lincoln produced the least cars.  
+  
+## Exercise 4:  
+# Make a box plot of hwy, grouped by cyl. Do you see a pattern? If so, what?    
+```{r}
+boxplot(mpg$hwy~mpg$cyl)
+```
+  
+The boxplot of highway miles per gallon for 4 cylinders is slightly left skewed, with two outliers have big highway miles per gallon. The one with 5 cylinders is slight right skewed, but the range is super small. Therefore, we could say it approximately normal. For the boxplot with 6 cylinders, we could say its distribution is approximately normal as well. Since there is no outlier and with slightly skeweness towards to the right. The one with 8 cylinders, this distribution is left skewed and has three outliers have big highway miles per gallon. Overall, the car with more number of cylinders tends to have lower highway miles per gallon.  
+  
+## Exercise 5:
+# Use the corrplot package to make a lower triangle correlation matrix of the mpg dataset. (Hint: You can find information on the package here.)
+
+# Which variables are positively or negatively correlated with which others? Do these relationships make sense to you? Are there any that surprise you?  
+```{r}
+data <- mpg[, c(3:5,8:9)]
+data
+m = cor(data)
+corrplot(m, method='number', type='lower')
+```
+  
+'cyl' is strong positively correlates with 'displ.'  
+'hwy' is strong positively correlates with 'cty.'  
+'cty' is strong negatively correlates with 'displ' and 'cyl.'  
+'hwy' is strong negatively correlates with 'displ' and 'cyl.'  
+All the positive correlations make sense. But city miles per gallon and highway miles per gallon decrease with more cylinders and higher engine displacement surprise me.  
+
+
+
+
+
