@@ -1,0 +1,39 @@
+---
+title: "Final_Data_Memo"
+author: "Xiaohe Ye"
+date: '2022-10-02'
+output: html_document
+---
+
+```{r, include=FALSE}
+library(visdat)
+data <- read.csv("compound.csv")
+print(data)
+vis_miss(data, warn_large_data=FALSE)
+
+```
+## An overview of my dataset.  
+The dataset consists of 94,663 samples representing the training and test set. It includes the following columns: Timestamp of query (‘Time’), Cryptocurrency name (‘Cryptocurrency’), Rate (‘Rate’), Trading Volume (‘Volume’), Number of tweets (‘NumTweets’), Mean positive VADER Score (‘Positive’), Mean negative VADER Score (‘Negative’), Mean compound VADER Score (‘Compound’) and Mean neutral VADER Score (‘Neutral’). I will mainly work with quantitative variables and one qualitative variable 'Cryptocurrency', which is the name of the altcoins. In addition, this dataset doesn't have missing data.  
+
+https://figshare.com/articles/dataset/Predicting_altcoin_returns_using_social_media/7416845  
+https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0208119
+  
+  
+## An overview of my research questions.  
+I’m interested in predicting ‘Rate.’ Can we predict the price of ETH by using the vador scores and the number of tweets? My response/outcome variable is ‘Rate’, the exchange rate between altcoins and bitcoins, unit is BTC. The question will be best answered with a regression approach. I think variable ‘Compound’, the mean VADER Score would be especially useful. The goal of my model is predictive. Because I want to predict the price of altcoins based on giving predictors.  
+
+## Proposed project timeline.  
+I will have my data set loaded and start EDA--2nd week.  
+Finish EDA and its narration--3rd week.   
+Feature Extraction--4th week.  
+Data Splitting--5th week.   
+Model Fitting--6th week.   
+Discussion and conclusion--7th week.   
+Final modification and check before submitting --(8th-10th week).  
+
+  
+## Any questions or concerns.  
+Are there any problems or difficult aspects of the project you anticipate?
+There are a lot of observations that have the value of zero for some of their attributes. Would this affect whether the model builds successfully? Should I remove the observations that contain 0 value for some of the attributes?  
+
+
