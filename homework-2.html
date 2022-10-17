@@ -1648,7 +1648,9 @@ predict <code>age</code>. Explain why you shouldn’t use
 <ol style="list-style-type: decimal">
 <li>dummy code any categorical predictors</li>
 </ol>
-<pre class="r"><code>abalone_recipe &lt;- recipe(age~., data = abalone_train, select=-rings) %&gt;% step_dummy(all_nominal_predictors())</code></pre>
+<pre class="r"><code>abalone_train &lt;- subset(abalone_train, select = -rings)
+
+abalone_recipe &lt;- recipe(age~., data = abalone_train) %&gt;% step_dummy(all_nominal_predictors())</code></pre>
 <p>We shouldn’t use ‘rings’ to predict ‘age.’ Because ‘rings’ is <span class="math inline">\(100\%\)</span> relating with ‘age.’ Which means
 any change of ‘rings’ is significant for the value of ‘age.’ And since
 its impact is too significant. Therefore, it also leads the significance
@@ -1708,6 +1710,7 @@ hypothetical female abalone with longest_shell = 0.50, diameter = 0.10,
 height = 0.30, whole_weight = 4, shucked_weight = 1, viscera_weight = 2,
 shell_weight = 1.</p>
 <pre class="r"><code># we can fit the linear model to the training set
+# abalone_train &lt;- subset(abalone_train, select = -rings)
 lm_fit &lt;- fit(lm_wflow, abalone_train)  
 
 # We can view the model results:
@@ -1716,24 +1719,23 @@ lm_fit %&gt;%
   extract_fit_parsnip() %&gt;% 
   # Now tidy the linear model object:
   tidy()</code></pre>
-<pre><code>## # A tibble: 15 x 5
-##    term                           estimate std.error statistic p.value
-##    &lt;chr&gt;                             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-##  1 (Intercept)                    1.50e+ 0  5.96e-14  2.52e+13   0    
-##  2 longest_shell                 -1.16e-13  2.05e-13 -5.66e- 1   0.572
-##  3 diameter                       1.40e-13  2.74e-13  5.13e- 1   0.608
-##  4 height                        -1.69e-14  1.39e-13 -1.21e- 1   0.904
-##  5 whole_weight                   4.13e-15  7.35e-14  5.62e- 2   0.955
-##  6 shucked_weight                -4.05e-14  1.04e-13 -3.91e- 1   0.696
-##  7 viscera_weight                -5.17e-14  1.27e-13 -4.08e- 1   0.683
-##  8 shell_weight                  -5.47e-14  1.35e-13 -4.06e- 1   0.685
-##  9 rings                          1.00e+ 0  1.49e-15  6.70e+14   0    
-## 10 type_I                        -2.44e-14  2.19e-14 -1.12e+ 0   0.265
-## 11 type_M                         2.96e-14  1.87e-14  1.58e+ 0   0.113
-## 12 type_I_x_shucked_weight        6.89e-14  6.69e-14  1.03e+ 0   0.303
-## 13 type_M_x_shucked_weight       -5.20e-14  3.80e-14 -1.37e+ 0   0.172
-## 14 longest_shell_x_diameter      -5.98e-14  3.71e-13 -1.61e- 1   0.872
-## 15 shucked_weight_x_shell_weight  1.80e-13  1.50e-13  1.20e+ 0   0.231</code></pre>
+<pre><code>## # A tibble: 14 x 5
+##    term                          estimate std.error statistic  p.value
+##    &lt;chr&gt;                            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1 (Intercept)                      4.10      0.713      5.76 9.29e- 9
+##  2 longest_shell                    4.16      2.46       1.69 9.11e- 2
+##  3 diameter                        22.2       3.26       6.80 1.24e-11
+##  4 height                           5.35      1.67       3.20 1.37e- 3
+##  5 whole_weight                    10.0       0.863     11.6  1.77e-30
+##  6 shucked_weight                 -19.0       1.19     -15.9  1.20e-54
+##  7 viscera_weight                  -8.49      1.51      -5.62 2.05e- 8
+##  8 shell_weight                    12.8       1.60       7.98 2.01e-15
+##  9 type_I                          -1.96      0.260     -7.55 5.50e-14
+## 10 type_M                          -0.550     0.224     -2.45 1.41e- 2
+## 11 type_I_x_shucked_weight          4.21      0.798      5.27 1.48e- 7
+## 12 type_M_x_shucked_weight          1.39      0.456      3.04 2.38e- 3
+## 13 longest_shell_x_diameter       -31.1       4.42      -7.04 2.35e-12
+## 14 shucked_weight_x_shell_weight   -2.12      1.80      -1.18 2.39e- 1</code></pre>
 <pre class="r"><code># predict age through given values
 predicted_age &lt;- 4.1049767+4.1591558    *0.5+22.1540948*0.1+5.3503017*0.3+10.0046878    *4-18.9646646*1-8.4928895*2+12.7622431*1-1.9643754*1-0.5499008*0    
 predicted_age</code></pre>
@@ -1761,29 +1763,29 @@ abalone_train_res %&gt;%
 <pre><code>## # A tibble: 6 x 1
 ##   .pred
 ##   &lt;dbl&gt;
-## 1  8.50
-## 2  8.50
-## 3  8.50
-## 4  8.50
-## 5  9.50
-## 6  9.50</code></pre>
+## 1  9.45
+## 2  8.06
+## 3  9.80
+## 4 10.4 
+## 5 10.1 
+## 6 11.0</code></pre>
 <pre class="r"><code>abalone_train_res &lt;- bind_cols(abalone_train_res, abalone_train %&gt;% select(age))
 abalone_train_res %&gt;% 
   head() </code></pre>
 <pre><code>## # A tibble: 6 x 2
 ##   .pred   age
 ##   &lt;dbl&gt; &lt;dbl&gt;
-## 1  8.50   8.5
-## 2  8.50   8.5
-## 3  8.50   8.5
-## 4  8.50   8.5
-## 5  9.50   9.5
-## 6  9.50   9.5</code></pre>
+## 1  9.45   8.5
+## 2  8.06   8.5
+## 3  9.80   8.5
+## 4 10.4    8.5
+## 5 10.1    9.5
+## 6 11.0    9.5</code></pre>
 <pre class="r"><code>rmse(abalone_train_res, truth = age, estimate = .pred)</code></pre>
 <pre><code>## # A tibble: 1 x 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 rmse    standard    1.89e-13</code></pre>
+## 1 rmse    standard        2.19</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li>Finally, apply your metric set to the tibble, report the results,
 and interpret the <em>R<sup>2</sup></em> value.</li>
@@ -1793,9 +1795,9 @@ and interpret the <em>R<sup>2</sup></em> value.</li>
 <pre><code>## # A tibble: 3 x 3
 ##   .metric .estimator .estimate
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 rmse    standard    1.89e-13
-## 2 rsq     standard    1   e+ 0
-## 3 mae     standard    1.89e-13</code></pre>
+## 1 rmse    standard       2.19 
+## 2 rsq     standard       0.560
+## 3 mae     standard       1.57</code></pre>
 <p><em>R<sup>2</sup></em> is <span class="math inline">\(1\)</span>.
 Which means a model that explains all the variation in the response
 variable around its mean.</p>

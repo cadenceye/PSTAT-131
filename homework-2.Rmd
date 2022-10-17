@@ -68,7 +68,9 @@ Steps for your recipe:
 
 1.  dummy code any categorical predictors  
 ```{r}
-abalone_recipe <- recipe(age~., data = abalone_train, select=-rings) %>% step_dummy(all_nominal_predictors())
+abalone_train <- subset(abalone_train, select = -rings)
+
+abalone_recipe <- recipe(age~., data = abalone_train) %>% step_dummy(all_nominal_predictors())
 ```
   
   We shouldn't use 'rings' to predict 'age.' Because 'rings' is $100\%$ relating with 'age.' Which means any change of 'rings' is significant for the value of 'age.' And since its impact is too significant. Therefore, it also leads the significance level of other predictors to a very small value.  
@@ -142,6 +144,7 @@ lm_wflow <- lm_wflow %>% add_recipe(abalone_recipe)
 Use your `fit()` object to predict the age of a hypothetical female abalone with longest_shell = 0.50, diameter = 0.10, height = 0.30, whole_weight = 4, shucked_weight = 1, viscera_weight = 2, shell_weight = 1.  
 ```{r}
 # we can fit the linear model to the training set
+# abalone_train <- subset(abalone_train, select = -rings)
 lm_fit <- fit(lm_wflow, abalone_train)  
 
 # We can view the model results:
