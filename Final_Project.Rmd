@@ -205,7 +205,13 @@ also our reponse variable, or what I'll predict all the time in the whole
 report.  
 * Finally, I have $332$ samples for train dataset and $189$ samples for test
 dataset.  
-* Next, use *v*-fold cross-validation on the training set. Use 5 folds.
+* Next, use *v*-fold cross-validation on the training set. Use 5 folds. 
+Dataset is split into a 5 number of folds and is used to evaluate the model's
+ability when given new data. K5 refers to the number of groups the data sample 
+is split into. In other words we split the data points into 5 equally sized 
+subsets in K-folds cross-validation, called "folds." One split subsets act as 
+the testing set, and the remaining folds will train the model.  
+
 ```{r}
 crypto_train <- crypto[which(crypto$date <= '2017-05-05'),] # data collected before '2017-05-05' were collecting for training, there are around 333 observations
 crypto_test <- crypto[which(crypto$date >= '2017-05-09'),] # data collected before '2017-05-05' were collecting for testing, there are around 190 observations
@@ -368,6 +374,12 @@ logi_tune <- tune_grid(
 save(logi_tune, logi_wf, file = "logi_tune.rda")
 ```
 
+  The best logistic regression model has a roc_auc around $0.5014652$.  
+```{r}
+show_best(logi_tune, metric = "roc_auc") %>% select(-.estimator, -.config)
+```
+
+
 
 ### Random Forest
 * This is a classification model.
@@ -403,9 +415,19 @@ save(rf_tune, rf_workflow, file = "rf_tune.rda")
 
 ```{r}
 autoplot(rf_tune)
+show_best(logi_tune, metric = "roc_auc") %>% select(-.estimator, -.config)
+```
+    
+Taking a quick peak at the autoplot() function, it is clear that accuracy and 
+roc_auc decreases as the number of randomly selected predictors increases. 
+The smaller number of observations needed to keep splitting nodes
+(minimal_node_size) has higher accuracy and roc_auc.  
+
+```{r}
+show_best(rf_tune, metric = "roc_auc") %>% select(-.estimator, -.config)
 ```
   
-  
+    
 ### Boosted Trees
 * This is a classification model.
 * Set up a workflow of boosted trees.
@@ -442,6 +464,13 @@ save(bt_tune, bt_workflow, file = "bt_tune.rda")
 ```{r}
 autoplot(bt_tune)
 ```
+  Lower learn_rate, higher number of ramdoml selected predictors tends to have 
+  higher accuracy and roc_auc.  
+  
+```{r}
+show_best(bt_tune, metric = "roc_auc") %>% select(-.estimator, -.config)
+```
+
 
 ### KNN(K-nearest neighbors)
 * This is a classification model.
@@ -478,7 +507,13 @@ save(knn_tune, knn_workflow, file = "knn_tune.rda")
 ```{r}
 autoplot(knn_tune)
 ```
-
+  
+  Taking a quick peak at the autoplot() function, this shows that the idea 
+  number of neighbors is 1. Let’s confirm this with the show_best() function.
+```{r}
+show_best(knn_tune, metric = "roc_auc") %>% select(-.estimator, -.config)
+```
+  
 ### Compare models
 We load the saved results of each model first and choose the best one of each
 of them. And then select to show the mean value of `roc_auc`. Higher value of
@@ -493,15 +528,17 @@ load("rf_tune.rda")
 load("knn_tune.rda")
 
 # choose the best one of each of them.
-logi <- (show_best(logi_tune, metric = "roc_auc") %>% select(-.estimator, -.config))[1,]
-rf <- (show_best(rf_tune, metric = "roc_auc") %>% select(-.estimator, -.config))[1,]
-bt <- (show_best(bt_tune, metric = "roc_auc") %>% select(-.estimator, -.config))[1,]
-knn <- (show_best(knn_tune, metric = "roc_auc") %>% select(-.estimator, -.config))[1,]
+#logi <- (show_best(logi_tune, metric = "roc_auc") %>% select(-.estimator, -.config))[1,]
+#rf <- (show_best(rf_tune, metric = "roc_auc") %>% select(-.estimator, -.config))[1,]
+#bt <- (show_best(bt_tune, metric = "roc_auc") %>% select(-.estimator, -.config))[1,]
+#knn <- (show_best(knn_tune, metric = "roc_auc") %>% select(-.estimator, -.config))[1,]
+logi <- (show_best(logi_tune, metric = "roc_auc") %>% select(mean))[1,]
+rf <- (show_best(rf_tune, metric = "roc_auc") %>% select(mean))[1,]
+bt <- (show_best(bt_tune, metric = "roc_auc") %>% select(mean))[1,]
+knn <- (show_best(knn_tune, metric = "roc_auc") %>% select(mean))[1,]
 
-logi
-rf
-bt
-knn
+table <- c(logi, rf, bt, knn)
+table
 ```
 
 ## Final Fitting
@@ -522,6 +559,10 @@ model_test_predictions %>% accuracy(truth = make_money, estimate=.pred_class)
 ```
 
 ## Conclusion
+KNN model performs best and Random Forest model performs worst. Not very
+surprising, since Sparse Datasets (Zero Values). There are a lot zero values 
+in the dataset. Which might be the rason make Random Forest fail.
+
 The `roc_auc` of the KNN model is around $0.56$ when I run it most of the time. 
 Sometimes, it's even really close to $0.6$. According to the value of `roc_auc`,
 this is not a very good model but it's still valuable. Since the `roc_auc` 
