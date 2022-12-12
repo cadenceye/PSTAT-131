@@ -1,5 +1,5 @@
 * `Time`: (string) timestamp of query, unit is a calendar year. Both, 
-rate(price) and social media activities were updated every $3$ hours.    
+rate(price) and social media activities were updated every 3 hours.    
 * `Cryptocurrency`: (string) altcoin name  
 * `Rate`: (numeric) rate or price of certain altcoin, unit is one BTC  
 * `Volume`: (numeric) trading Volume    
