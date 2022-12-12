@@ -1,0 +1,10 @@
+* `Time`: (string) timestamp of query, unit is a calendar year. Both, 
+rate(price) and social media activities were updated every $3$ hours.    
+* `Cryptocurrency`: (string) altcoin name  
+* `Rate`: (numeric) rate or price of certain altcoin, unit is one BTC  
+* `Volume`: (numeric) trading Volume    
+* `NumTweets`: (numeric) mean number of tweets, unit is Count(n)  
+* `Coumpound`: (numeric) mean VADER Score
+* `Negative`: (numeric) mean negative VADER Score 
+* `Positive`: (numeric) mean positive VADER Score  
+* `Neutral`: (numeric) mean neutral VADER Score   
